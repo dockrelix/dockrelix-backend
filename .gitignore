@@ -1,0 +1,43 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Output directories
+bin/
+build/
+
+# Dependency directories
+vendor/
+
+# Go build artifacts
+*.log
+*.out
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+
+# Environment variables file
+.env
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Test coverage files
+coverage.out
+
+# Docker-related files
+docker-compose.override.yml
+
+# Go module cache (optional, usually not ignored)
+go.sum
+
+# Ignore compiled files and temporary build directories created by Go tools.
