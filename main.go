@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/dockrelix/dockrelix-backend/database"
-	"github.com/dockrelix/dockrelix-backend/handlers"
-	"github.com/dockrelix/dockrelix-backend/models"
-	"github.com/dockrelix/dockrelix-backend/middleware"
 	"log"
 	"os"
+
+	"github.com/dockrelix/dockrelix-backend/database"
+	"github.com/dockrelix/dockrelix-backend/docker"
+	"github.com/dockrelix/dockrelix-backend/handlers"
+	"github.com/dockrelix/dockrelix-backend/middleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -14,31 +15,34 @@ import (
 
 func main() {
 	_ = godotenv.Load()
-	
+
 	database.Connect()
 	database.AutoMigrate()
-	
-	seedInitialUser()
-	
-	r := gin.Default()
-	
-	r.POST("/login", handlers.Login)
-	r.GET("/protected", middleware.JWTAuth(), handlers.ProtectedEndpoint)
-	
-	log.Fatal(r.Run(":" + os.Getenv("PORT")))
-}
 
-func seedInitialUser() {
-	var count int64
-	database.DB.Model(&models.User{}).Count(&count)
-	
-	if count == 0 {
-		user := models.User{
-			Username: "admin",
-			Password: handlers.HashPassword("admin"),
-			Email:    "admin@example.com",
-		}
-		database.DB.Create(&user)
-		log.Println("Initial user created")
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		log.Fatalf("Failed to create Docker client: %v", err)
 	}
+	defer cli.Close()
+
+	r := gin.Default()
+
+	auth := r.Group("/auth")
+	{
+		auth.POST("/login", handlers.Login)
+
+		// Setup routes
+		auth.GET("/is-setup", handlers.IsSetup)
+		auth.POST("/setup", handlers.Setup)
+	}
+
+	docker := r.Group("/docker")
+	docker.Use(middleware.JWTAuth())
+	{
+		docker.GET("/stacks", func(c *gin.Context) {
+			handlers.ListStacks(cli, c)
+		})
+	}
+
+	log.Fatal(r.Run(":" + os.Getenv("PORT")))
 }
