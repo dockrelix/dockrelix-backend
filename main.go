@@ -43,6 +43,14 @@ func main() {
 		docker.GET("/stacks", func(c *gin.Context) {
 			handlers.ListStacks(cli, c)
 		})
+
+		docker.POST("/stacks/draft", func(c *gin.Context) {
+			handlers.CreateStackDraft(cli, c)
+		})
+
+		docker.GET("/stacks/drafts", func(c *gin.Context) {
+			handlers.GetStackDrafts(c)
+		})
 	}
 
 	log.Fatal(r.Run(":" + os.Getenv("PORT")))

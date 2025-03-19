@@ -8,6 +8,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
+	"github.com/dockrelix/dockrelix-backend/database"
 	"github.com/dockrelix/dockrelix-backend/models"
 )
 
@@ -106,4 +107,18 @@ func ListStacks(cli *client.Client) []models.Stack {
 	}
 
 	return result
+}
+
+func SaveDraft(stackDraft models.StackDraft) error {
+	if err := database.DB.Create(&models.StackDraft{Name: stackDraft.Name, Data: stackDraft.Data}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func GetDrafts() []models.StackDraft {
+	var drafts []models.StackDraft
+	database.DB.Find(&drafts)
+	return drafts
 }
