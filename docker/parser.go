@@ -3,7 +3,6 @@ package docker
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"strconv"
 	"strings"
 
@@ -184,14 +183,6 @@ func GenerateStackConfig(services []swarm.Service, networks []swarm.Network, vol
 	}
 
 	for _, cfg := range configs {
-		// marshall cfg and write to file in kson
-		d := cfg
-		data, err := yaml.Marshal(d)
-		if err != nil {
-			return nil, err
-		}
-		ioutil.WriteFile("aaa.json", data, 0644)
-
 		labels := cfg.Spec.Labels
 		delete(labels, "com.docker.stack.namespace")
 		config.Configs[RemoveStackFromName(cfg.Spec.Name, stackName)] = parser.Config{
@@ -296,8 +287,6 @@ func ParseStackConfig(cli *client.Client, stackName string) (parser.ComposeConfi
 	if err != nil {
 		return parser.ComposeConfig{}, err
 	}
-
-	ioutil.WriteFile("config.yaml", configBytes, 0644)
 
 	return config, nil
 }
