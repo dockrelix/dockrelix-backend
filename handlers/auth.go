@@ -60,6 +60,14 @@ func IsSetup(c *gin.Context) {
 }
 
 func Setup(c *gin.Context) {
+	var count int64
+	database.DB.Model(&models.User{}).Count(&count)
+
+	if count != 0 {
+		c.JSON(400, gin.H{"error": "Setup already complete"})
+		return
+	}
+
 	var information struct {
 		Username     string `json:"username"`
 		Password     string `json:"password"`

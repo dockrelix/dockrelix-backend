@@ -4,6 +4,12 @@
 *.so
 *.dylib
 
+# Binary for dockrelix-backend
+dockrelix-backend
+
+# Database file
+database/database.db
+
 # Output directories
 bin/
 build/

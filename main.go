@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -15,7 +16,7 @@ import (
 
 func main() {
 	_ = godotenv.Load()
-
+	fmt.Println("trying to connect to database")
 	database.Connect()
 	database.AutoMigrate()
 
