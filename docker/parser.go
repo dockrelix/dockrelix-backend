@@ -11,10 +11,18 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/api/types/volume"
-	"github.com/docker/docker/client"
 	"github.com/dockrelix/dockrelix-backend/models/parser"
 	"gopkg.in/yaml.v3"
 )
+
+// Internal DockerClient interface to allow mocking in tests (might change in the future)
+type DockerClient interface {
+	ServiceList(ctx context.Context, options types.ServiceListOptions) ([]swarm.Service, error)
+	NetworkList(ctx context.Context, options network.ListOptions) ([]network.Summary, error)
+	VolumeList(ctx context.Context, options volume.ListOptions) (volume.ListResponse, error)
+	SecretList(ctx context.Context, options types.SecretListOptions) ([]swarm.Secret, error)
+	ConfigList(ctx context.Context, options types.ConfigListOptions) ([]swarm.Config, error)
+}
 
 func RemoveStackFromName(name, stackName string) string {
 	output, _ := strings.CutPrefix(name, stackName+"_")
@@ -193,7 +201,7 @@ func GenerateStackConfig(services []swarm.Service, networks []swarm.Network, vol
 	return yaml.Marshal(config)
 }
 
-func ParseStackConfig(cli *client.Client, stackName string) (parser.ComposeConfig, error) {
+func ParseStackConfig(cli DockerClient, stackName string) (parser.ComposeConfig, error) {
 	services, err := cli.ServiceList(context.Background(), types.ServiceListOptions{
 		Filters: filters.NewArgs(filters.Arg("label", "com.docker.stack.namespace="+stackName)),
 	})

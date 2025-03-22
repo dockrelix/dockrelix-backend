@@ -6,7 +6,7 @@ import (
 
 func SanitizeInput(input string) string {
 	replacer := strings.NewReplacer(
-		"'", "", "\"", "", ";", "", "--", "", "/*", "", "*/", "", "xp_", "",
+		"'", "", "\"", "", ";", "", "--", "", "/*", "", "*/", "", "xp_", "", "/", "",
 	)
 	return replacer.Replace(input)
 }

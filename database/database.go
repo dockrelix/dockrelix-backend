@@ -33,3 +33,19 @@ func AutoMigrate() {
 		log.Fatal("Database migration failed:", err)
 	}
 }
+
+// For tests only - creates an in-memory database
+func InitDBForTesting() *gorm.DB {
+	var err error
+	DB, err = gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect to database")
+	}
+
+	err = DB.AutoMigrate(&models.User{})
+	if err != nil {
+		panic(fmt.Sprintf("failed to migrate database: %v", err))
+	}
+
+	return DB
+}

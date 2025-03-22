@@ -44,6 +44,10 @@ func main() {
 			handlers.ListStacks(cli, c)
 		})
 
+		docker.GET("/stacks/:name", func(c *gin.Context) {
+			handlers.ParseStackConfig(cli, c)
+		})
+
 		docker.POST("/stacks/draft", func(c *gin.Context) {
 			handlers.CreateStackDraft(cli, c)
 		})
